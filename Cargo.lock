@@ -594,6 +594,7 @@ dependencies = [
  "anyhow",
  "clap",
  "handlebars",
+ "serde",
  "serde_json",
  "xcra_core",
 ]
