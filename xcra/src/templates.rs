@@ -88,7 +88,7 @@ impl FailureResultTemplate {
 		},
 		{
 			"type": "divider"
-		},
+		}{{#unless @last}},{{/unless}}
         {{/each}}
 	]
 }
