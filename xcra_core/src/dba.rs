@@ -57,7 +57,7 @@ impl Dba {
         tcr.result AS result
     FROM TestCases tc
     JOIN TestCaseRuns tcr ON tc.rowid = tcr.testCase_fk
-    ORDER BY tc.testSuite_fk, tc.orderInTestSuite;
+    ORDER BY tcr.result ASC;
         ",
         )?;
         let rows = stmt
