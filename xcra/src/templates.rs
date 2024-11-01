@@ -1,11 +1,31 @@
 #[derive(Clone, clap::ValueEnum)]
-pub enum BuiltInTemplate {
+pub enum ResultTemplate {
     Markdown,
 }
 
-impl BuiltInTemplate {
+#[derive(Clone, clap::ValueEnum)]
+pub enum FailureResultTemplate {
+    Markdown,
+    Slack,
+}
+
+impl ResultTemplate {
     pub fn template(&self) -> String {
-        r#"## Summary
+        r#"## Test Results
+| Test Name | Result |
+|-----------|--------|
+{{#each test_results}}
+| {{name}} | {{toEmoji result}} |
+{{/each}}
+            "#
+        .to_owned()
+    }
+}
+
+impl FailureResultTemplate {
+    pub fn template(&self) -> String {
+        match self {
+            Self::Markdown => r#"## Summary
 | Test Name | Failure Count |
 |-----------|---------------|
 {{#each test_results}}
@@ -35,6 +55,45 @@ impl BuiltInTemplate {
 
 {{/each}}
         "#
-        .to_owned()
+            .to_owned(),
+            Self::Slack => r#"
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Failed Tests",
+				"emoji": true
+			}
+		},
+        {{#each test_results}}
+		{
+			"type": "section",
+			"text": {
+				"type": "plain_text",
+				"text": "❌ {{name}}",
+				"emoji": true
+			}
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "Failure count: {{failure_count}}",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "divider"
+		},
+        {{/each}}
+	]
+}
+                "#
+            .to_owned(),
+        }
     }
 }

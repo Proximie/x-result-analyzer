@@ -15,7 +15,7 @@ impl Dba {
         Ok(Self { connection })
     }
 
-    pub fn get_test_results(&self) -> Result<TestResults, crate::error::XcraError> {
+    pub fn get_failed_test_results(&self) -> Result<TestFailedResults, crate::error::XcraError> {
         let mut stmt = self.connection.prepare(
             "
     SELECT
@@ -36,7 +36,7 @@ impl Dba {
         )?;
         let rows = stmt
             .query_map([], |row| {
-                Ok(TestRunResult {
+                Ok(FailedTestRunResult {
                     name: row.get(0)?,
                     failure_count: row.get(1)?,
                     failure_reasons: row.get(2)?,
@@ -46,8 +46,45 @@ impl Dba {
             })?
             .flatten()
             .collect::<Vec<_>>();
+        Ok(TestFailedResults { test_results: rows })
+    }
+
+    pub fn get_test_results(&self) -> Result<TestResults, crate::error::XcraError> {
+        let mut stmt = self.connection.prepare(
+            "
+    SELECT
+        tc.name AS name,
+        tcr.result AS result
+    FROM TestCases tc
+    JOIN TestCaseRuns tcr ON tc.rowid = tcr.testCase_fk
+    ORDER BY tc.testSuite_fk, tc.orderInTestSuite;
+        ",
+        )?;
+        let rows = stmt
+            .query_map([], |row| {
+                Ok(TestRunResult {
+                    name: row.get(0)?,
+                    result: row.get(1)?,
+                })
+            })?
+            .flatten()
+            .collect::<Vec<_>>();
         Ok(TestResults { test_results: rows })
     }
+}
+
+#[derive(Debug, Serialize)]
+pub struct TestFailedResults {
+    test_results: Vec<FailedTestRunResult>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct FailedTestRunResult {
+    name: String,
+    failure_count: i64,
+    failure_reasons: String,
+    error_locations: String,
+    average_duration: f64,
 }
 
 #[derive(Debug, Serialize)]
@@ -58,8 +95,5 @@ pub struct TestResults {
 #[derive(Debug, Serialize)]
 pub struct TestRunResult {
     name: String,
-    failure_count: i64,
-    failure_reasons: String,
-    error_locations: String,
-    average_duration: f64,
+    result: String,
 }
