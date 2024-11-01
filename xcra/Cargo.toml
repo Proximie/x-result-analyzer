@@ -1,0 +1,7 @@
+[package]
+name = "xcra"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+xcra_core = { path = "../xcra_core" }
