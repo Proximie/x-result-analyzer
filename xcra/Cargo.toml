@@ -4,4 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.92"
+clap = { version = "4.5.20", features = ["derive"] }
+handlebars = "6.2.0"
 xcra_core = { path = "../xcra_core" }
+serde_json = "1.0.132"

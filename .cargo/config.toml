@@ -1,0 +1,2 @@
+[alias]
+xcra = ["run", "-rq", "--"]
