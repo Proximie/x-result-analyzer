@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["xcra", "xcra_core"]
+members = ["xra", "xra_core"]
 
 [workspace.dependencies]
 serde = { version = "1.0.214", features = ["derive"] }
