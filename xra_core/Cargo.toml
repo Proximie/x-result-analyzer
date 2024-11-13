@@ -1,5 +1,5 @@
 [package]
-name = "xcra_core"
+name = "xra_core"
 version = "0.1.0"
 edition = "2021"
 
