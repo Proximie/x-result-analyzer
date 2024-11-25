@@ -7,6 +7,6 @@ edition = "2021"
 anyhow = "1.0.92"
 clap = { version = "4.5.20", features = ["derive"] }
 handlebars = "6.2.0"
-xra_core = { path = "../xra_core" }
-serde.workspace = true
 serde_json.workspace = true
+serde.workspace = true
+xra_core = { path = "../xra_core" }
