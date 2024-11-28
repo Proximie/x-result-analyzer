@@ -52,7 +52,11 @@ fn main() -> anyhow::Result<()> {
                 },
             output,
         }) => {
-            todo!("Support custom templates");
+            let params = xra_core::generate_failure_report(&xcresult_path)?;
+            let reg = Handlebars::new();
+            let content = fs::read_to_string(path)?;
+            let content = reg.render_template(&content, &params)?;
+            fs::write(output, content)?;
         }
         Cli::Generate(Generate::FailureReport {
             xcresult_path: _,
@@ -101,7 +105,11 @@ fn main() -> anyhow::Result<()> {
                 },
             output,
         }) => {
-            todo!("Support custom templates");
+            let params = xra_core::generate_failure_report(&xcresult_path)?;
+            let reg = Handlebars::new();
+            let content = fs::read_to_string(path)?;
+            let content = reg.render_template(&content, &params)?;
+            fs::write(output, content)?;
         }
         Cli::Generate(Generate::Report {
             xcresult_path: _,
