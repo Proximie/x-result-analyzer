@@ -7,7 +7,14 @@ A tool designed to process and analyze .xcresult bundles generated from Xcode te
 ### Cargo
 
 ```sh
-cargo install --git https://github.com/Proximie/x-result-analyzer`
+cargo install --git https://github.com/Proximie/x-result-analyzer
+```
+
+### Homebrew
+
+```sh
+brew tap Proximie/xra
+brew install xra
 ```
 
 ## Example Usage
