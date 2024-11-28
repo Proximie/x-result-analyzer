@@ -18,13 +18,13 @@ fn main() -> anyhow::Result<()> {
             xra_core::generate_xcresult_db(&xcresult_path)?;
         }
         Cli::Generate(Generate::FailureReport {
-            xcresult_path,
+            xcresult_path: _,
             template:
                 Template {
                     builtin: Some(_),
                     custom: Some(_),
                 },
-            output,
+            output: _,
         }) => {
             bail!("Only one template is allowed");
         }
@@ -55,24 +55,24 @@ fn main() -> anyhow::Result<()> {
             todo!("Support custom templates");
         }
         Cli::Generate(Generate::FailureReport {
-            xcresult_path,
+            xcresult_path: _,
             template:
                 Template {
                     builtin: None,
                     custom: None,
                 },
-            output,
+            output: _,
         }) => {
             bail!("Template is required");
         }
         Cli::Generate(Generate::Report {
-            xcresult_path,
+            xcresult_path: _,
             template:
                 Template {
                     builtin: Some(_),
                     custom: Some(_),
                 },
-            output,
+            output: _,
         }) => {
             bail!("Only one template is allowed");
         }
@@ -104,15 +104,15 @@ fn main() -> anyhow::Result<()> {
             todo!("Support custom templates");
         }
         Cli::Generate(Generate::Report {
-            xcresult_path,
+            xcresult_path: _,
             template:
                 Template {
                     builtin: None,
                     custom: None,
                 },
-            output,
+            output: _,
         }) => {
-            todo!("Support custom templates");
+            bail!("Template is required");
         }
         Cli::Get(Get::Summary { xcresult_path }) => {
             xra_core::get_summary(&xcresult_path)?;
