@@ -1,9 +1,9 @@
-#[derive(Clone, clap::ValueEnum)]
+#[derive(Debug, Clone, clap::ValueEnum)]
 pub enum ResultTemplate {
     Markdown,
 }
 
-#[derive(Clone, clap::ValueEnum)]
+#[derive(Debug, Clone, clap::ValueEnum)]
 pub enum FailureResultTemplate {
     Markdown,
     Slack,

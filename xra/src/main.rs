@@ -2,11 +2,13 @@ mod hbs_helpers;
 mod params;
 mod templates;
 
+use anyhow::bail;
 use clap::Parser;
 use handlebars::Handlebars;
 use params::Cli;
 use params::Generate;
 use params::Get;
+use params::Template;
 use std::fs;
 
 fn main() -> anyhow::Result<()> {
@@ -17,7 +19,22 @@ fn main() -> anyhow::Result<()> {
         }
         Cli::Generate(Generate::FailureReport {
             xcresult_path,
-            template,
+            template:
+                Template {
+                    builtin: Some(_),
+                    custom: Some(_),
+                },
+            output,
+        }) => {
+            bail!("Only one template is allowed");
+        }
+        Cli::Generate(Generate::FailureReport {
+            xcresult_path,
+            template:
+                Template {
+                    builtin: Some(template),
+                    custom: None,
+                },
             output,
         }) => {
             let params = xra_core::generate_failure_report(&xcresult_path)?;
@@ -26,9 +43,46 @@ fn main() -> anyhow::Result<()> {
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
         }
+        Cli::Generate(Generate::FailureReport {
+            xcresult_path,
+            template:
+                Template {
+                    builtin: None,
+                    custom: Some(path),
+                },
+            output,
+        }) => {
+            todo!("Support custom templates");
+        }
+        Cli::Generate(Generate::FailureReport {
+            xcresult_path,
+            template:
+                Template {
+                    builtin: None,
+                    custom: None,
+                },
+            output,
+        }) => {
+            bail!("Template is required");
+        }
         Cli::Generate(Generate::Report {
             xcresult_path,
-            template,
+            template:
+                Template {
+                    builtin: Some(_),
+                    custom: Some(_),
+                },
+            output,
+        }) => {
+            bail!("Only one template is allowed");
+        }
+        Cli::Generate(Generate::Report {
+            xcresult_path,
+            template:
+                Template {
+                    builtin: Some(template),
+                    custom: None,
+                },
             output,
         }) => {
             let params = xra_core::generate_tests_report(&xcresult_path)?;
@@ -37,6 +91,28 @@ fn main() -> anyhow::Result<()> {
             let content = template.template();
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
+        }
+        Cli::Generate(Generate::Report {
+            xcresult_path,
+            template:
+                Template {
+                    builtin: None,
+                    custom: Some(path),
+                },
+            output,
+        }) => {
+            todo!("Support custom templates");
+        }
+        Cli::Generate(Generate::Report {
+            xcresult_path,
+            template:
+                Template {
+                    builtin: None,
+                    custom: None,
+                },
+            output,
+        }) => {
+            todo!("Support custom templates");
         }
         Cli::Get(Get::Summary { xcresult_path }) => {
             xra_core::get_summary(&xcresult_path)?;
