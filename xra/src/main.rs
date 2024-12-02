@@ -13,6 +13,10 @@ use std::fs;
 
 fn main() -> anyhow::Result<()> {
     let args = Cli::try_parse()?;
+
+    let mut reg = Handlebars::new();
+    reg.register_helper("toEmoji", Box::new(hbs_helpers::result_to_emoji));
+
     match args {
         Cli::Generate(Generate::Database { xcresult_path }) => {
             xra_core::generate_xcresult_db(&xcresult_path)?;
@@ -38,7 +42,6 @@ fn main() -> anyhow::Result<()> {
             output,
         }) => {
             let params = xra_core::generate_failure_report(&xcresult_path)?;
-            let reg = Handlebars::new();
             let content = template.template();
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
@@ -53,7 +56,6 @@ fn main() -> anyhow::Result<()> {
             output,
         }) => {
             let params = xra_core::generate_failure_report(&xcresult_path)?;
-            let reg = Handlebars::new();
             let content = fs::read_to_string(path)?;
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
@@ -90,8 +92,6 @@ fn main() -> anyhow::Result<()> {
             output,
         }) => {
             let params = xra_core::generate_tests_report(&xcresult_path)?;
-            let mut reg = Handlebars::new();
-            reg.register_helper("toEmoji", Box::new(hbs_helpers::result_to_emoji));
             let content = template.template();
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
@@ -106,7 +106,6 @@ fn main() -> anyhow::Result<()> {
             output,
         }) => {
             let params = xra_core::generate_failure_report(&xcresult_path)?;
-            let reg = Handlebars::new();
             let content = fs::read_to_string(path)?;
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
