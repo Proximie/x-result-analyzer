@@ -46,6 +46,27 @@ impl Dba {
             })?
             .flatten()
             .collect::<Vec<_>>();
+
+        // for test_result in rows.clone() {
+        //     // Process error locations and failure reasons
+        //     let location_parts: Vec<&str> = test_result
+        //         .error_locations
+        //         .as_deref()
+        //         .unwrap_or("")
+        //         .split(';')
+        //         .collect();
+        //     let reason_parts: Vec<&str> = test_result.failure_reasons.split(';').collect();
+
+        //     // Loop through the locations and reasons
+        //     for (location, reason) in location_parts.iter().zip(reason_parts.iter()) {
+        //         if let Some((file, line, col)) = parse_location(location) {
+        //             let _ = log_github_action_annotation(file, line, col, "error", reason);
+        //         } else {
+        //             println!("Failed to parse location: {}", location);
+        //         }
+        //     }
+        // }
+
         Ok(TestFailedResults { test_results: rows })
     }
 
@@ -78,12 +99,12 @@ pub struct TestFailedResults {
     test_results: Vec<FailedTestRunResult>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct FailedTestRunResult {
     name: String,
     failure_count: i64,
     failure_reasons: String,
-    error_locations: String,
+    error_locations: Option<String>,
     average_duration: f64,
 }
 
