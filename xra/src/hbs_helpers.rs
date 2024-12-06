@@ -34,3 +34,55 @@ pub fn result_to_emoji(
 
     Ok(())
 }
+
+pub fn get_file_name(
+    helper: &Helper,
+    _: &Handlebars,
+    _: &Context,
+    _: &mut RenderContext,
+    out: &mut dyn Output,
+) -> HelperResult {
+    let location = helper
+        .param(0)
+        .map(|v| v.value().as_str())
+        .unwrap_or_default();
+    if let Some((file, _, _)) = parse_location(location.unwrap_or("")) {
+        out.write(file)?;
+    }
+    Ok(())
+}
+
+pub fn get_line(
+    helper: &Helper,
+    _: &Handlebars,
+    _: &Context,
+    _: &mut RenderContext,
+    out: &mut dyn Output,
+) -> HelperResult {
+    let location = helper
+        .param(0)
+        .map(|v| v.value().as_str())
+        .unwrap_or_default();
+    if let Some((_, line, _)) = parse_location(location.unwrap_or("")) {
+        out.write(&line.to_string())?;
+    }
+    Ok(())
+}
+
+fn parse_location(location: &str) -> Option<(&str, u32, Option<u32>)> {
+    let parts: Vec<&str> = location.split(':').collect();
+    match parts.len() {
+        2 => {
+            let file = parts[0];
+            let line = parts[1].parse::<u32>().ok()?;
+            Some((file, line, None))
+        }
+        3 => {
+            let file = parts[0];
+            let line = parts[1].parse::<u32>().ok()?;
+            let col = parts[2].parse::<u32>().ok()?;
+            Some((file, line, Some(col)))
+        }
+        _ => None,
+    }
+}

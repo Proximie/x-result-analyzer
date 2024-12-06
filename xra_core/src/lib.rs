@@ -3,6 +3,7 @@ mod macros;
 pub mod dba;
 pub mod error;
 
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
@@ -26,7 +27,9 @@ pub fn generate_xcresult_db(xcresult_path: &PathBuf) -> Result<(), error::XcraEr
     Ok(())
 }
 
-pub fn generate_failure_report(xcresult_path: &PathBuf) -> Result<serde_json::Value, error::XcraError> {
+pub fn generate_failure_report(
+    xcresult_path: &PathBuf,
+) -> Result<serde_json::Value, error::XcraError> {
     if !fs::exists(pathbuf![xcresult_path, "database.sqlite3"])? {
         generate_xcresult_db(xcresult_path)?;
     }
@@ -37,7 +40,9 @@ pub fn generate_failure_report(xcresult_path: &PathBuf) -> Result<serde_json::Va
     Ok(serde_json::to_value(&results)?)
 }
 
-pub fn generate_tests_report(xcresult_path: &PathBuf) -> Result<serde_json::Value, error::XcraError> {
+pub fn generate_tests_report(
+    xcresult_path: &PathBuf,
+) -> Result<serde_json::Value, error::XcraError> {
     if !fs::exists(pathbuf![xcresult_path, "database.sqlite3"])? {
         generate_xcresult_db(xcresult_path)?;
     }
@@ -84,5 +89,37 @@ pub fn get_tests_report(xcresult_path: &PathBuf) -> Result<(), error::XcraError>
     let dba = Dba::new(&xcresult_path.display().to_string())?;
     let results = dba.get_test_results()?;
     println!("{:#?}", results);
+    Ok(())
+}
+
+pub fn log_github_action_annotation(
+    file: &str,
+    line: u32,
+    col: Option<u32>,
+    level: &str,
+    message: &str,
+) -> io::Result<()> {
+    let mut log_file = OpenOptions::new()
+        .create(true) // Create the file if it doesn't exist
+        .append(true) // Append to the file
+        .open("error_logs.txt")?; // Open the log file (path is "error_logs.txt")
+
+    match col {
+        Some(col) => {
+            writeln!(
+                log_file,
+                "::{} file={},line={},col={}::{}",
+                level, file, line, col, message
+            )?;
+        }
+        None => {
+            writeln!(
+                log_file,
+                "::{} file={},line={}::{}",
+                level, file, line, message
+            )?;
+        }
+    }
+
     Ok(())
 }

@@ -110,6 +110,7 @@ fn main() -> anyhow::Result<()> {
             let content = fs::read_to_string(&path)
                 .with_context(|| format!("Failed to read template file: {}", path.display()))?;
             let content = reg.render_template(&content, &params)?;
+
             fs::write(output, content)?;
         }
         Cli::Generate(Generate::Report {

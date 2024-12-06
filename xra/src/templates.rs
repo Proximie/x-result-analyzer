@@ -7,6 +7,7 @@ pub enum ResultTemplate {
 pub enum FailureResultTemplate {
     Markdown,
     Slack,
+    GitHubAnnoation,
 }
 
 impl ResultTemplate {
@@ -93,6 +94,12 @@ impl FailureResultTemplate {
 	]
 }
                 "#
+            .to_owned(),
+            Self::GitHubAnnoation => r#"
+{{#each test_results}}
+::error file={{getFileName name}},line={{getLine error_location}}::{{failure_reason}}
+{{/each}}
+            "#
             .to_owned(),
         }
     }
