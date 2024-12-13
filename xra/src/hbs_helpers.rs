@@ -6,6 +6,7 @@ use handlebars::JsonRender;
 use handlebars::Output;
 use handlebars::RenderContext;
 use handlebars::RenderErrorReason;
+use std::env;
 
 pub fn result_to_emoji(
     helper: &Helper,
@@ -47,7 +48,8 @@ pub fn get_file_name(
         .map(|v| v.value().as_str())
         .unwrap_or_default();
     if let Some(file) = parse_file_location(location.unwrap_or("")) {
-        out.write(&file)?;
+        let relative_file = strip_pwd(&file);
+        out.write(&relative_file)?;
     }
     Ok(())
 }
@@ -79,4 +81,14 @@ fn parse_file_location(location: &str) -> Option<String> {
     let (locations, _) = location.split_once(";").unwrap_or((location, ""));
     let (file, _) = locations.split_once(':')?;
     Some(file.to_string())
+}
+
+fn strip_pwd(file_path: &str) -> String {
+    let current_dir = env::current_dir().expect("Failed to get current directory");
+    let path = std::path::Path::new(file_path);
+
+    match path.strip_prefix(&current_dir) {
+        Ok(relative_path) => relative_path.to_string_lossy().to_string(),
+        Err(_) => file_path.to_string(),
+    }
 }
