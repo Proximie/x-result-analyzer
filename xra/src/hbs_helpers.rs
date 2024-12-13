@@ -46,8 +46,8 @@ pub fn get_file_name(
         .param(0)
         .map(|v| v.value().as_str())
         .unwrap_or_default();
-    if let Some((file, _, _)) = parse_location(location.unwrap_or("")) {
-        out.write(file)?;
+    if let Some(file) = parse_file_location(location.unwrap_or("")) {
+        out.write(&file)?;
     }
     Ok(())
 }
@@ -63,26 +63,20 @@ pub fn get_line(
         .param(0)
         .map(|v| v.value().as_str())
         .unwrap_or_default();
-    if let Some((_, line, _)) = parse_location(location.unwrap_or("")) {
+    if let Some(line) = parse_file_line(location.unwrap_or("")) {
         out.write(&line.to_string())?;
     }
     Ok(())
 }
 
-fn parse_location(location: &str) -> Option<(&str, u32, Option<u32>)> {
-    let parts: Vec<&str> = location.split(':').collect();
-    match parts.len() {
-        2 => {
-            let file = parts[0];
-            let line = parts[1].parse::<u32>().ok()?;
-            Some((file, line, None))
-        }
-        3 => {
-            let file = parts[0];
-            let line = parts[1].parse::<u32>().ok()?;
-            let col = parts[2].parse::<u32>().ok()?;
-            Some((file, line, Some(col)))
-        }
-        _ => None,
-    }
+fn parse_file_line(location: &str) -> Option<u32> {
+    let (locations, _) = location.split_once(";").unwrap_or((location, ""));
+    let (_, line) = locations.split_once(':')?;
+    line.parse().ok()
+}
+
+fn parse_file_location(location: &str) -> Option<String> {
+    let (locations, _) = location.split_once(";").unwrap_or((location, ""));
+    let (file, _) = locations.split_once(':')?;
+    Some(file.to_string())
 }
