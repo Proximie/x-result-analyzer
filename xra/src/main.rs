@@ -3,6 +3,7 @@ mod params;
 mod templates;
 
 use anyhow::bail;
+use anyhow::Context;
 use clap::Parser;
 use handlebars::Handlebars;
 use params::Cli;
@@ -12,8 +13,7 @@ use params::Template;
 use std::fs;
 
 fn main() -> anyhow::Result<()> {
-    let args = Cli::try_parse()?;
-
+    let args = Cli::parse();
     let mut reg = Handlebars::new();
     reg.register_helper("toEmoji", Box::new(hbs_helpers::result_to_emoji));
 
@@ -56,7 +56,8 @@ fn main() -> anyhow::Result<()> {
             output,
         }) => {
             let params = xra_core::generate_failure_report(&xcresult_path)?;
-            let content = fs::read_to_string(path)?;
+            let content = fs::read_to_string(&path)
+                .with_context(|| format!("Failed to read template file: {}", path.display()))?;
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
         }
@@ -106,7 +107,8 @@ fn main() -> anyhow::Result<()> {
             output,
         }) => {
             let params = xra_core::generate_failure_report(&xcresult_path)?;
-            let content = fs::read_to_string(path)?;
+            let content = fs::read_to_string(&path)
+                .with_context(|| format!("Failed to read template file: {}", path.display()))?;
             let content = reg.render_template(&content, &params)?;
             fs::write(output, content)?;
         }
