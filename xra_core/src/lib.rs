@@ -3,13 +3,13 @@ mod macros;
 pub mod dba;
 pub mod error;
 
+use dba::Dba;
+use std::fs;
 use std::fs::OpenOptions;
+use std::io;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
-use std::{fs, io};
-
-use dba::Dba;
 
 pub fn generate_xcresult_db(xcresult_path: &PathBuf) -> Result<(), error::XcraError> {
     if !fs::exists(xcresult_path)? {

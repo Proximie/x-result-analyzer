@@ -16,6 +16,8 @@ fn main() -> anyhow::Result<()> {
     let args = Cli::parse();
     let mut reg = Handlebars::new();
     reg.register_helper("toEmoji", Box::new(hbs_helpers::result_to_emoji));
+    reg.register_helper("getFileName", Box::new(hbs_helpers::get_file_name));
+    reg.register_helper("getLine", Box::new(hbs_helpers::get_line));
 
     match args {
         Cli::Generate(Generate::Database { xcresult_path }) => {
