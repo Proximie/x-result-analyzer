@@ -97,7 +97,7 @@ impl FailureResultTemplate {
             .to_owned(),
             Self::GithubAnnotation => r#"
 {{#each test_results}}
-::error file={{getFileName error_locations}},line={{getLine error_locations}}::{{failure_reason}}
+::error file={{getFileName error_locations}},line={{getLine error_locations}}::{{failure_reasons}}
 {{/each}}
 "#
             .to_owned(),
